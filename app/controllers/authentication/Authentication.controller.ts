@@ -15,6 +15,7 @@ import IRegistrationRequest from '../../request/RegistrationRequest';
 import { AuthService } from '../../services/Auth.service';
 import { VerificationService } from '../../services/Verification.service';
 import { ResetService } from '../../services/Reset.service';
+import { RESERVED_USERNAMES } from '../../constants';
 import { hash } from '../../utils/hash';
 
 import { IRequest } from '../../request/IRequest';
@@ -55,6 +56,10 @@ export async function register(request: Request, response: Response) {
 
     if (existingUser && existingUser.email.toLowerCase() === email.toLowerCase()) {
         return response.status(409).json({ error: 'A user already exists with the provided email.' });
+    }
+
+    if (RESERVED_USERNAMES.includes(username.toLowerCase())) {
+        return response.status(409).json({ error: 'The specified username is reserved and cannot be registered.' });
     }
 
     // Register the user in the database, generating a new user with the default and minimal
